@@ -2,9 +2,9 @@ import React, {useState, useEffect} from 'react';
 import { AgGridReact } from 'ag-grid-react';
 import IconButton from '@mui/material/IconButton';
 import DeleteIcon from '@mui/icons-material/Delete';
-import Button from '@mui/material/Button';
 import Snackbar from '@mui/material/Snackbar';
-import CloseIcon from '@mui/icons-material/Close';
+import Addcar from './Addcar';
+import Editcar from './Editcar';
 
 import 'ag-grid-community/dist/styles/ag-grid.css';
 import 'ag-grid-community/dist/styles/ag-theme-material.css';
@@ -48,17 +48,57 @@ function Carlist(){
         }
     }
 
+    const addCar = (newCar) => {
+        fetch('http://carrestapi.herokuapp.com/cars', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(newCar)
+        })
+        .then(response => {
+            if(!response.ok){
+                alert('Car could not be added');
+            }else
+            {
+                fetchCars();
+            }
+        })
+        .catch(err => console.log(err))
+    }
+
+    const updateCar = (updatedCar, link) => {
+        fetch(link, { 
+            method: 'PUT',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(updatedCar)
+        })
+        .then(response => {
+            if(!response.ok){
+                alert('Car could not be updated');
+            }else
+            {
+                fetchCars();
+            }
+        })
+        .catch(err => console.log(err))
+    }
+
     const [columns] = useState([
-        {field: "brand", sortable: true, filter: true},
-        {field: "model", sortable: true, filter: true},
+        {field: "brand", sortable: true, filter: true, width: 150},
+        {field: "model", sortable: true, filter: true, width: 150},
         {field: "color", sortable: true, filter: true, width: 100},
         {field: "fuel", sortable: true, filter: true, width: 100},
         {field: "year", sortable: true, filter: true, width: 100},
-        {field: "price", sortable: true, filter: true, width: 150},
+        {field: "price", sortable: true, filter: true, width: 100},
         {
-            headerName: "",
+            headerName: '',
+            width: 100,
+            field: '_links.self.href',
+            cellRenderer: params => <Editcar  params={params} updateCar={updateCar} />
+        },
+        {
+            headerName: '',
             field: "_links.self.href", 
-            width: 120,
+            width: 100,
             cellRenderer: params => 
                 <IconButton color="error" onClick={() => deleteCar(params.value)}>
                     <DeleteIcon />
@@ -68,7 +108,8 @@ function Carlist(){
 
     return(
         <>
-            <h2>Carlist</h2>
+            &nbsp;
+            <Addcar addCar={addCar}/>
             <div className="ag-theme-material" style={{height: 600, width:1000}}>
                 <AgGridReact
                     rowData={cars}
