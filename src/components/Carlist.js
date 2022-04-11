@@ -23,7 +23,7 @@ function Carlist(){
 
     //Fetch the list of all cars
     const fetchCars = () => {
-        fetch('http://carrestapi.herokuapp.com/cars')
+        fetch(process.env.REACT_APP_API_URL)
         .then(response => response.json())
         .then(data => setCars(data._embedded.cars))
         .catch(err => console.log(err))
@@ -49,7 +49,7 @@ function Carlist(){
     }
 
     const addCar = (newCar) => {
-        fetch('http://carrestapi.herokuapp.com/cars', {
+        fetch(process.env.REACT_APP_API_URL, {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify(newCar)
